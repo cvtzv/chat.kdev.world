@@ -3,176 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>.chat.kdev.world - KDEVGRAM</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>chat.kdev.world - KDEVGRAM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1d4ed8;
-            --background-color: #f3f4f6;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #4338ca;
+            --secondary: #1e293b;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+            --radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--background-color);
-            color: var(--text-color);
+            background: var(--bg-light);
+            color: var(--text-dark);
             line-height: 1.5;
             height: 100vh;
             overflow: hidden;
         }
 
-        .container {
+        .app-container {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
             height: 100vh;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .chat {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            height: 100%;
+        .card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            height: 90vh;
+            transition: all 0.3s ease;
         }
 
-        .header {
+        .full-height {
+            height: 100vh;
+            max-width: 100%;
+            border-radius: 0;
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-light);
+        }
+
+        .welcome-logo {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 1rem;
+            border-bottom: 1px solid var(--border);
             background: white;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
             z-index: 10;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.75rem;
         }
 
         .avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--primary-color);
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
-        .messages {
-            padding: 20px;
-            overflow-y: auto;
+        .user-details {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            scroll-behavior: smooth;
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: var(--success);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--border);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: var(--bg-light);
         }
 
         .message {
-            padding: 12px 16px;
-            border-radius: 16px;
-            max-width: 80%;
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
             position: relative;
+            animation: fadeIn 0.3s ease;
             word-break: break-word;
+            line-height: 1.4;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.received {
-            background: var(--background-color);
             align-self: flex-start;
+            background: white;
+            border: 1px solid var(--border);
             border-bottom-left-radius: 4px;
         }
 
         .message.sent {
-            background: var(--primary-color);
-            color: white;
             align-self: flex-end;
+            background: var(--primary);
+            color: white;
             border-bottom-right-radius: 4px;
         }
 
-        .message-meta {
-            font-size: 0.75rem;
-            margin-top: 4px;
-            opacity: 0.7;
+        .message-sender {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
         }
 
-        .input-area {
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            background: white;
             display: flex;
             align-items: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid var(--border-color);
-            gap: 10px;
-            position: sticky;
-            bottom: 0;
-            z-index: 10;
+            gap: 0.75rem;
         }
 
-        .message-input {
+        .message-textarea {
             flex: 1;
-            padding: 12px;
-            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
             border-radius: 24px;
             outline: none;
-            font-size: 1rem;
-            transition: border-color 0.2s;
             resize: none;
-            max-height: 120px;
-            min-height: 24px;
+            max-height: 100px;
+            font-size: 1rem;
+            background: var(--bg-light);
+            transition: all 0.2s ease;
         }
 
-        .message-input:focus {
-            border-color: var(--primary-color);
+        .message-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
         }
 
-        .send-button {
-            padding: 12px 24px;
-            background: var(--primary-color);
+        .send-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 24px;
             cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
         }
 
-        .send-button:hover {
-            background: var(--secondary-color);
+        .send-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
         }
 
-        .send-button:disabled {
-            background: var(--border-color);
+        .send-btn:disabled {
+            background: var(--border);
             cursor: not-allowed;
+            transform: none;
         }
 
         .modal {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            padding: 1rem;
         }
 
         .modal.active {
@@ -181,22 +325,42 @@
 
         .modal-content {
             background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            width: 90%;
+            border-radius: var(--radius);
+            width: 100%;
             max-width: 400px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
             position: relative;
+            animation: slideIn 0.3s ease;
         }
 
-        .close-modal {
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-close {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: none;
+            background: transparent;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--text-color);
+            color: var(--text-dark);
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .auth-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-dark);
         }
 
         .auth-form {
@@ -205,108 +369,137 @@
             gap: 1rem;
         }
 
-        .auth-input {
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
-        .auth-button {
-            padding: 12px;
-            background: var(--primary-color);
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
+        .auth-btn {
+            padding: 0.75rem;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: var(--radius);
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
         }
 
-        .auth-button:disabled {
-            background: var(--border-color);
+        .auth-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .auth-btn:disabled {
+            background: var(--border);
             cursor: not-allowed;
         }
 
         .auth-switch {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
         }
 
-        .auth-switch a {
-            color: var(--primary-color);
+        .auth-link {
+            color: var(--primary);
             text-decoration: none;
             cursor: pointer;
+            font-weight: 500;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
         }
 
         .error-message {
-            color: #dc2626;
+            color: var(--error);
             font-size: 0.875rem;
-            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            background: rgba(239, 68, 68, 0.1);
+            display: none;
         }
 
         @media (max-width: 768px) {
-            .container {
+            .app-container {
                 padding: 0;
-                height: 100vh;
             }
 
-            .chat {
+            .card {
+                height: 100vh;
+                max-width: 100%;
                 border-radius: 0;
-                height: 100vh;
-            }
-
-            .message {
-                max-width: 90%;
-            }
-
-            .modal-content {
-                width: 95%;
             }
         }
     </style>
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app" class="app-container"></div>
 
     <div id="authModal" class="modal">
         <div class="modal-content">
-            <button class="close-modal" onclick="app.closeModal()">&times;</button>
+            <button class="modal-close" onclick="app.closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
             <div id="authForm"></div>
         </div>
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://rjhbugwsqzugkixxbsxp.supabase.co'
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqaGJ1Z3dzcXp1Z2tpeHhic3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjE1MTAsImV4cCI6MjA1NTczNzUxMH0.I7_DEUU4eyESz_HDp4quiRORn5xgGt6TBLwp9rrQTpQ'
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+        const SUPABASE_URL = 'https://rjhbugwsqzugkixxbsxp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqaGJ1Z3dzcXp1Z2tpeHhic3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjE1MTAsImV4cCI6MjA1NTczNzUxMH0.I7_DEUU4eyESz_HDp4quiRORn5xgGt6TBLwp9rrQTpQ';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentUser = null
-        let currentProfile = null
-        let messageSubscription = null
+        let currentUser = null;
+        let currentProfile = null;
+        let messageSubscription = null;
+        let isMobile = window.innerWidth < 768;
 
         const app = {
             async init() {
-                this.container = document.getElementById('app')
-                await this.checkAuth()
-                this.setupEventListeners()
+                this.container = document.getElementById('app');
+                await this.checkAuth();
+                this.setupEventListeners();
+                this.handleResize();
             },
 
             async checkAuth() {
-                const { data: { session }, error } = await supabase.auth.getSession()
+                const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) {
-                    console.error('Ошибка проверки авторизации:', error)
-                    return
+                    console.error('Ошибка проверки авторизации:', error);
+                    return;
                 }
                 
                 if (session) {
-                    currentUser = session.user
+                    currentUser = session.user;
                     if (await this.loadProfile()) {
-                        this.showChat()
+                        this.showChat();
                     } else {
-                        await this.handleLogout()
+                        await this.handleLogout();
                     }
                 } else {
-                    this.showAuthButtons()
+                    this.showWelcomeScreen();
                 }
             },
 
@@ -316,230 +509,273 @@
                         .from('profiles')
                         .select('*')
                         .eq('id', currentUser.id)
-                        .single()
+                        .single();
 
-                    if (error) throw error
-                    if (!data) throw new Error('Профиль не найден')
+                    if (error) throw error;
+                    if (!data) throw new Error('Профиль не найден');
 
-                    currentProfile = data
-                    return true
+                    currentProfile = data;
+                    return true;
                 } catch (error) {
-                    console.error('Ошибка загрузки профиля:', error)
-                    return false
+                    console.error('Ошибка загрузки профиля:', error);
+                    return false;
                 }
             },
 
-            showAuthButtons() {
+            showWelcomeScreen() {
                 this.container.innerHTML = `
-                    <div class="container">
-                        <div style="text-align: center; padding-top: 100px;">
-                            <h1 style="margin-bottom: 2rem;">Добро пожаловать на chat.kdev.world</h1>
-                            <button onclick="app.showLoginModal()" class="auth-button" style="margin: 0 10px;">Войти</button>
-                            <button onclick="app.showRegisterModal()" class="auth-button" style="margin: 0 10px;">Регистрация</button>
+                    <div class="card ${isMobile ? 'full-height' : ''}">
+                        <div class="welcome-screen">
+                            <div class="welcome-logo">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h1 class="welcome-title">Добро пожаловать в KDEVGRAM</h1>
+                            <p class="welcome-subtitle">Войдите или зарегистрируйтесь, чтобы начать общение</p>
+                            <div class="btn-group">
+                                <button onclick="app.showLoginModal()" class="btn btn-primary">Войти</button>
+                                <button onclick="app.showRegisterModal()" class="btn btn-outline">Регистрация</button>
+                            </div>
                         </div>
                     </div>
-                `
+                `;
             },
 
             showLoginModal() {
                 document.getElementById('authForm').innerHTML = `
-                    <h2 style="margin-bottom: 1.5rem;">Вход</h2>
+                    <h2 class="auth-title">Вход в аккаунт</h2>
                     <form class="auth-form" onsubmit="app.handleLogin(event)">
-                        <input type="email" placeholder="Email" class="auth-input" required>
-                        <input type="password" placeholder="Пароль" class="auth-input" required minlength="6">
-                        <button type="submit" class="auth-button">Войти</button>
-                        <div class="error-message" style="display: none;"></div>
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <input type="email" id="email" placeholder="Введите email" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="password">Пароль</label>
+                            <input type="password" id="password" placeholder="Введите пароль" class="form-input" required minlength="6">
+                        </div>
+                        <div class="error-message"></div>
+                        <button type="submit" class="auth-btn">Войти</button>
                     </form>
                     <div class="auth-switch">
-                        <a onclick="app.showRegisterModal()">Нет аккаунта? Зарегистрируйтесь</a>
+                        <span>Нет аккаунта?</span>
+                        <a class="auth-link" onclick="app.showRegisterModal()">Зарегистрироваться</a>
                     </div>
-                `
-                document.getElementById('authModal').classList.add('active')
+                `;
+                document.getElementById('authModal').classList.add('active');
             },
 
             showRegisterModal() {
                 document.getElementById('authForm').innerHTML = `
-                    <h2 style="margin-bottom: 1.5rem;">Регистрация</h2>
+                    <h2 class="auth-title">Создание аккаунта</h2>
                     <form class="auth-form" onsubmit="app.handleRegister(event)">
-                        <input type="text" placeholder="Имя пользователя" class="auth-input" required minlength="3" maxlength="30">
-                        <input type="text" placeholder="Полное имя" class="auth-input" required minlength="2" maxlength="50">
-                        <input type="email" placeholder="Email" class="auth-input" required>
-                        <input type="password" placeholder="Пароль" class="auth-input" required minlength="6">
-                        <button type="submit" class="auth-button">Зарегистрироваться</button>
-                        <div class="error-message" style="display: none;"></div>
+                        <div class="form-group">
+                            <label class="form-label" for="username">Имя пользователя</label>
+                            <input type="text" id="username" placeholder="Введите имя пользователя" class="form-input" required minlength="3" maxlength="30">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="fullname">Полное имя</label>
+                            <input type="text" id="fullname" placeholder="Введите полное имя" class="form-input" required minlength="2" maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="reg-email">Email</label>
+                            <input type="email" id="reg-email" placeholder="Введите email" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="reg-password">Пароль</label>
+                            <input type="password" id="reg-password" placeholder="Минимум 6 символов" class="form-input" required minlength="6">
+                        </div>
+                        <div class="error-message"></div>
+                        <button type="submit" class="auth-btn">Зарегистрироваться</button>
                     </form>
                     <div class="auth-switch">
-                        <a onclick="app.showLoginModal()">Уже есть аккаунт? Войдите</a>
+                        <span>Уже есть аккаунт?</span>
+                        <a class="auth-link" onclick="app.showLoginModal()">Войти</a>
                     </div>
-                `
-                document.getElementById('authModal').classList.add('active')
+                `;
+                document.getElementById('authModal').classList.add('active');
             },
 
             closeModal() {
-                document.getElementById('authModal').classList.remove('active')
-                const errorMessage = document.querySelector('.error-message')
+                document.getElementById('authModal').classList.remove('active');
+                const errorMessage = document.querySelector('.error-message');
                 if (errorMessage) {
-                    errorMessage.style.display = 'none'
-                    errorMessage.textContent = ''
+                    errorMessage.style.display = 'none';
+                    errorMessage.textContent = '';
                 }
             },
 
             showError(form, message) {
-                const errorDiv = form.querySelector('.error-message')
-                errorDiv.textContent = message
-                errorDiv.style.display = 'block'
+                const errorDiv = form.querySelector('.error-message');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
             },
 
             async handleLogin(event) {
-                event.preventDefault()
-                const form = event.target
-                const submitButton = form.querySelector('button')
-                submitButton.disabled = true
+                event.preventDefault();
+                const form = event.target;
+                const submitButton = form.querySelector('button');
+                submitButton.disabled = true;
 
                 try {
-                    const email = form.querySelector('input[type="email"]').value
-                    const password = form.querySelector('input[type="password"]').value
+                    const email = form.querySelector('#email').value;
+                    const password = form.querySelector('#password').value;
 
                     const { data, error } = await supabase.auth.signInWithPassword({
                         email,
                         password
-                    })
+                    });
 
-                    if (error) throw error
+                    if (error) throw error;
 
-                    currentUser = data.user
+                    currentUser = data.user;
                     if (await this.loadProfile()) {
-                        this.closeModal()
-                        this.showChat()
+                        this.closeModal();
+                        this.showChat();
                     } else {
-                        throw new Error('Не удалось загрузить профиль')
+                        throw new Error('Не удалось загрузить профиль');
                     }
                 } catch (error) {
-                    this.showError(form, 'Ошибка входа: ' + error.message)
+                    this.showError(form, 'Ошибка входа: ' + error.message);
                 } finally {
-                    submitButton.disabled = false
+                    submitButton.disabled = false;
                 }
             },
 
-// Исправьте функцию handleRegister примерно так:
-async handleRegister(event) {
-    event.preventDefault();
-    const form = event.target;
-    const submitButton = form.querySelector('button');
-    submitButton.disabled = true;
+            async handleRegister(event) {
+                event.preventDefault();
+                const form = event.target;
+                const submitButton = form.querySelector('button');
+                submitButton.disabled = true;
 
-    try {
-        const username = form.querySelector('input[placeholder="Имя пользователя"]').value;
-        const fullName = form.querySelector('input[placeholder="Полное имя"]').value;
-        const email = form.querySelector('input[type="email"]').value;
-        const password = form.querySelector('input[type="password"]').value;
+                try {
+                    const username = form.querySelector('#username').value;
+                    const fullName = form.querySelector('#fullname').value;
+                    const email = form.querySelector('#reg-email').value;
+                    const password = form.querySelector('#reg-password').value;
 
-const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-        data: {
-            username: username,
-            full_name: fullName
-        }
-    }
-});
+                    const { data, error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                username: username,
+                                full_name: fullName
+                            }
+                        }
+                    });
 
-if (error) throw error;
+                    if (error) throw error;
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise(resolve => setTimeout(resolve, 2000));
 
-        currentUser = data.user;
-        if (await this.loadProfile()) {
-            this.closeModal();
-            this.showChat();
-        } else {
-            throw new Error('Не удалось создать профиль');
-        }
-    } catch (error) {
-        this.showError(form, 'Ошибка регистрации: ' + error.message);
-    } finally {
-        submitButton.disabled = false;
-    }
-},
+                    currentUser = data.user;
+                    if (await this.loadProfile()) {
+                        this.closeModal();
+                        this.showChat();
+                    } else {
+                        throw new Error('Не удалось создать профиль');
+                    }
+                } catch (error) {
+                    this.showError(form, 'Ошибка регистрации: ' + error.message);
+                } finally {
+                    submitButton.disabled = false;
+                }
+            },
 
             showChat() {
                 this.container.innerHTML = `
-                    <div class="container">
-                        <div class="chat">
-                            <div class="header">
+                    <div class="card ${isMobile ? 'full-height' : ''}">
+                        <div class="chat-container">
+                            <div class="chat-header">
                                 <div class="user-info">
                                     <div class="avatar">${currentProfile.username[0].toUpperCase()}</div>
-                                    <div>
-                                        <div style="font-weight: 600;">${this.escapeHtml(currentProfile.username)}</div>
-                                        <div style="font-size: 0.875rem; opacity: 0.7;">Онлайн</div>
+                                    <div class="user-details">
+                                        <div class="username">${this.escapeHtml(currentProfile.username)}</div>
+                                        <div class="status">Онлайн</div>
                                     </div>
                                 </div>
-                                <button onclick="app.handleLogout()" class="auth-button" style="padding: 8px 16px;">Выйти</button>
+                                <button onclick="app.handleLogout()" class="btn-icon">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </button>
                             </div>
-                            <div class="messages" id="messages"></div>
-                            <div class="input-area">
-                                <textarea class="message-input" placeholder="Введите сообщение..." id="messageInput" rows="1"></textarea>
-                                <button class="send-button" onclick="app.sendMessage()" id="sendButton" disabled>
+                            <div class="chat-messages" id="messages"></div>
+                            <div class="chat-input">
+                                <textarea class="message-textarea" placeholder="Введите сообщение..." id="messageInput" rows="1"></textarea>
+                                <button class="send-btn" onclick="app.sendMessage()" id="sendButton" disabled>
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                `
-                this.subscribeToMessages()
-                this.loadMessages()
-                this.setupMessageInput()
+                `;
+                this.subscribeToMessages();
+                this.loadMessages();
+                this.setupMessageInput();
             },
 
             setupMessageInput() {
-                const input = document.getElementById('messageInput')
-                const sendButton = document.getElementById('sendButton')
+                const input = document.getElementById('messageInput');
+                const sendButton = document.getElementById('sendButton');
 
                 const updateButtonState = () => {
-                    sendButton.disabled = !input.value.trim()
-                }
+                    sendButton.disabled = !input.value.trim();
+                };
 
                 input.addEventListener('input', (e) => {
-                    updateButtonState()
-                    e.target.style.height = 'auto'
-                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
-                })
+                    updateButtonState();
+                    e.target.style.height = 'auto';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+                });
 
                 input.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault()
+                        e.preventDefault();
                         if (!sendButton.disabled) {
-                            this.sendMessage()
+                            this.sendMessage();
                         }
                     }
-                })
+                });
 
-                updateButtonState()
+                updateButtonState();
             },
 
             setupEventListeners() {
                 window.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
-                        this.closeModal()
+                        this.closeModal();
                     }
-                })
+                });
+
+                window.addEventListener('resize', () => {
+                    this.handleResize();
+                });
 
                 supabase.auth.onAuthStateChange(async (event, session) => {
                     if (event === 'SIGNED_OUT') {
-                        currentUser = null
-                        currentProfile = null
-                        this.showAuthButtons()
-                        this.unsubscribeFromMessages()
+                        currentUser = null;
+                        currentProfile = null;
+                        this.showWelcomeScreen();
+                        this.unsubscribeFromMessages();
                     }
-                })
+                });
+            },
+            
+            handleResize() {
+                isMobile = window.innerWidth < 768;
+                const card = document.querySelector('.card');
+                if (card) {
+                    if (isMobile) {
+                        card.classList.add('full-height');
+                    } else {
+                        card.classList.remove('full-height');
+                    }
+                }
             },
 
             async handleLogout() {
                 try {
-                    await supabase.auth.signOut()
+                    await supabase.auth.signOut();
                 } catch (error) {
-                    console.error('Ошибка выхода:', error)
+                    console.error('Ошибка выхода:', error);
                 }
             },
 
@@ -555,30 +791,30 @@ if (error) throw error;
                             )
                         `)
                         .order('created_at', { ascending: true })
-                        .limit(50)
+                        .limit(50);
 
-                    if (error) throw error
+                    if (error) throw error;
 
-                    const messagesDiv = document.getElementById('messages')
-                    if (!messagesDiv) return
+                    const messagesDiv = document.getElementById('messages');
+                    if (!messagesDiv) return;
 
-                    messagesDiv.innerHTML = ''
-                    data.forEach(message => this.addMessageToDOM(message))
-                    this.scrollToBottom()
+                    messagesDiv.innerHTML = '';
+                    data.forEach(message => this.addMessageToDOM(message));
+                    this.scrollToBottom();
                 } catch (error) {
-                    console.error('Ошибка загрузки сообщений:', error)
+                    console.error('Ошибка загрузки сообщений:', error);
                 }
             },
 
             async sendMessage() {
-                const input = document.getElementById('messageInput')
-                const sendButton = document.getElementById('sendButton')
-                const message = input.value.trim()
+                const input = document.getElementById('messageInput');
+                const sendButton = document.getElementById('sendButton');
+                const message = input.value.trim();
                 
-                if (!message) return
+                if (!message) return;
 
                 try {
-                    sendButton.disabled = true
+                    sendButton.disabled = true;
                     const { error } = await supabase
                         .from('messages')
                         .insert([
@@ -586,37 +822,37 @@ if (error) throw error;
                                 content: message,
                                 user_id: currentUser.id
                             }
-                        ])
+                        ]);
 
-                    if (error) throw error
+                    if (error) throw error;
 
-                    input.value = ''
-                    input.style.height = 'auto'
-                    sendButton.disabled = true
+                    input.value = '';
+                    input.style.height = 'auto';
+                    sendButton.disabled = true;
                 } catch (error) {
-                    console.error('Ошибка отправки:', error)
-                    alert('Не удалось отправить сообщение')
+                    console.error('Ошибка отправки:', error);
+                    alert('Не удалось отправить сообщение');
                 }
             },
 
             subscribeToMessages() {
-                this.unsubscribeFromMessages()
+                this.unsubscribeFromMessages();
                 
                 messageSubscription = supabase
                     .channel('messages')
                     .on('postgres_changes', 
                         { event: 'INSERT', schema: 'public', table: 'messages' },
                         payload => {
-                            this.loadMessageWithProfile(payload.new.id)
+                            this.loadMessageWithProfile(payload.new.id);
                         }
                     )
-                    .subscribe()
+                    .subscribe();
             },
 
             unsubscribeFromMessages() {
                 if (messageSubscription) {
-                    supabase.removeChannel(messageSubscription)
-                    messageSubscription = null
+                    supabase.removeChannel(messageSubscription);
+                    messageSubscription = null;
                 }
             },
 
@@ -632,63 +868,69 @@ if (error) throw error;
                             )
                         `)
                         .eq('id', messageId)
-                        .single()
+                        .single();
 
-                    if (error) throw error
+                    if (error) throw error;
                     if (data) {
-                        this.addMessageToDOM(data)
-                        this.scrollToBottom()
+                        this.addMessageToDOM(data);
+                        this.scrollToBottom();
                     }
                 } catch (error) {
-                    console.error('Ошибка загрузки сообщения:', error)
+                    console.error('Ошибка загрузки сообщения:', error);
                 }
             },
 
             addMessageToDOM(message) {
-                const messagesDiv = document.getElementById('messages')
-                if (!messagesDiv) return
+                const messagesDiv = document.getElementById('messages');
+                if (!messagesDiv) return;
 
-                const messageClass = message.user_id === currentUser.id ? 'sent' : 'received'
-                const username = message.profiles?.username || 'Неизвестный пользователь'
+                const messageClass = message.user_id === currentUser.id ? 'sent' : 'received';
+                const username = message.profiles?.username || 'Неизвестный пользователь';
                 
-                const messageElement = document.createElement('div')
-                messageElement.className = `message ${messageClass}`
-                messageElement.innerHTML = `
-                    ${messageClass === 'received' ? `<div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 4px;">${this.escapeHtml(username)}</div>` : ''}
-                    ${this.escapeHtml(message.content)}
-                    <div class="message-meta">
-                        ${this.formatDate(message.created_at)}
-                    </div>
-                `
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${messageClass}`;
+                
+                if (messageClass === 'received') {
+                    messageElement.innerHTML = `
+                        <div class="message-sender">${this.escapeHtml(username)}</div>
+                        ${this.escapeHtml(message.content)}
+                        <div class="message-time">${this.formatDate(message.created_at)}</div>
+                    `;
+                } else {
+                    messageElement.innerHTML = `
+                        ${this.escapeHtml(message.content)}
+                        <div class="message-time">${this.formatDate(message.created_at)}</div>
+                    `;
+                }
 
-                messagesDiv.appendChild(messageElement)
+                messagesDiv.appendChild(messageElement);
             },
 
             scrollToBottom() {
-                const messagesDiv = document.getElementById('messages')
+                const messagesDiv = document.getElementById('messages');
                 if (messagesDiv) {
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 }
             },
 
             escapeHtml(unsafe) {
-                if (!unsafe) return ''
+                if (!unsafe) return '';
                 return unsafe
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")
                     .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;")
+                    .replace(/'/g, "&#039;");
             },
 
             formatDate(dateString) {
-                const date = new Date(dateString)
+                const date = new Date(dateString);
                 return date.toLocaleTimeString('ru-RU', { 
                     hour: '2-digit', 
                     minute: '2-digit'
-                })
+                });
             }
-        }
+        };
 
         document.addEventListener('DOMContentLoaded', () => app.init())
     </script>
